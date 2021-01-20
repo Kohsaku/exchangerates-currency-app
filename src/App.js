@@ -10,53 +10,44 @@ class App extends React.Component {
     this.state = {
       error: null,
       isLoaded: false,
-      rates: {},
+      USDrates: {},
+      EURrates: {},
+      HKDrates: {},
     };
   }
 
   componentDidMount() {
-    fetch("https://api.exchangeratesapi.io/latest?base=USD")
-      .then(res => res.json())
-      .then(
-        result => {
-          this.setState({
-            isLoaded: true,
-            rates: result.rates
-          });
-        },
-        error => {
-          this.setState({
-            isLoaded: true,
-            error
-          });
-        }
-      );
+    let urls = [
+      "https://api.exchangeratesapi.io/latest?base=USD",
+      "https://api.exchangeratesapi.io/latest?base=EUR",
+      "https://api.exchangeratesapi.io/latest?base=HKD",
+    ];
+    let requests = urls.map(url => fetch(url));
+    Promise.all(requests)
+      .then(responses => Promise.all(responses.map(response => response.json())))
+      .then(results => {
+        this.setState({
+          isLoaded: true,
+          USDrates: results[0].rates.JPY,
+          EURrates: results[1].rates.JPY,
+          HKDrates: results[2].rates.JPY
+        })
+      },
+      error => {
+        this.setState({
+          isLoaded: true,
+          error
+        });
+      });
   }
 
-  createTable = () => {
-    const rates = this.state;
-    var ratesArr = Object.keys(rates).map(i => rates[i])[2];
-    var table = [];
-    var children = [];
-    var displayedCurrencies = ["JPY", "USD", "EUR", "HKD"];
-
-    for (var key in ratesArr) {
-      if (ratesArr.hasOwnProperty(key) && displayedCurrencies.includes(key)) {
-        children.push(
-          <tr>
-          <td>{key}</td>
-          <td>{ratesArr[key]}</td>
-          </tr>
-        );
-      }
-    }
-  table.push(<tbody>{children}</tbody>);
-
-  return table;
-};
+  componentDidUpdate() {
+    console.log(this.state.USDrates);
+    console.log(this.state.EURrates);
+  }
 
   render() {
-    const { error, isLoaded } = this.state;
+    const { error, isLoaded} = this.state;
 
     if (error) {
       return <div>Oops: {error.message}</div>;
@@ -73,7 +64,18 @@ class App extends React.Component {
                   <th>Rate</th>
                 </tr>
               </thead>
-              {this.createTable()}
+              <tr>
+                <td>USD</td>
+                <td>{this.state.USDrates}</td>
+              </tr>
+              <tr>
+                <td>EUR</td>
+                <td>{this.state.EURrates}</td>
+              </tr>
+              <tr>
+                <td>HKD</td>
+                <td>{this.state.HKDrates}</td>
+              </tr>
             </table>
           </div>
         </div>
