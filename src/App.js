@@ -1,5 +1,6 @@
 import React from 'react';
 import Table from './components/table/table.components';
+import Header from './components/header/header.components';
 
 import './App.css';
 
@@ -13,6 +14,7 @@ class App extends React.Component {
       USDrates: {},
       EURrates: {},
       HKDrates: {},
+      CADrates: {}
     };
   }
 
@@ -21,6 +23,7 @@ class App extends React.Component {
       "https://api.exchangeratesapi.io/latest?base=USD",
       "https://api.exchangeratesapi.io/latest?base=EUR",
       "https://api.exchangeratesapi.io/latest?base=HKD",
+      "https://api.exchangeratesapi.io/latest?base=CAD"
     ];
     let requests = urls.map(url => fetch(url));
     Promise.all(requests)
@@ -30,7 +33,8 @@ class App extends React.Component {
           isLoaded: true,
           USDrates: results[0].rates.JPY,
           EURrates: results[1].rates.JPY,
-          HKDrates: results[2].rates.JPY
+          HKDrates: results[2].rates.JPY,
+          CADrates: results[3].rates.JPY,
         })
       },
       error => {
@@ -40,7 +44,6 @@ class App extends React.Component {
         });
       });
   }
-
   componentDidUpdate() {
     console.log(this.state.USDrates);
     console.log(this.state.EURrates);
@@ -55,29 +58,16 @@ class App extends React.Component {
       return <div>Loading...</div>;
     } else {
       return (
-        <div>
-          <div>
-            <table>
-              <thead>
-                <tr>
-                  <th>Currency</th>
-                  <th>Rate</th>
-                </tr>
-              </thead>
-              <tr>
-                <td>USD</td>
-                <td>{this.state.USDrates}</td>
-              </tr>
-              <tr>
-                <td>EUR</td>
-                <td>{this.state.EURrates}</td>
-              </tr>
-              <tr>
-                <td>HKD</td>
-                <td>{this.state.HKDrates}</td>
-              </tr>
-            </table>
-          </div>
+        <div className="App">
+          <Header />
+          <div className="App__body">
+            <Table className="table"
+              USDrates = {this.state.USDrates}
+              EURrates = {this.state.EURrates}
+              HKDrates = {this.state.HKDrates}
+              CADrates = {this.state.CADrates}
+            />
+        </div>
         </div>
       )
     }
