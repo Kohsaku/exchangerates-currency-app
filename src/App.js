@@ -1,5 +1,6 @@
 import React from 'react';
 import Table from './components/table/table.components';
+import Header from './components/header/header.components';
 
 import './App.css';
 
@@ -10,53 +11,46 @@ class App extends React.Component {
     this.state = {
       error: null,
       isLoaded: false,
-      rates: {},
+      USDrates: {},
+      EURrates: {},
+      HKDrates: {},
+      CADrates: {}
     };
   }
 
   componentDidMount() {
-    fetch("https://api.exchangeratesapi.io/latest?base=USD")
-      .then(res => res.json())
-      .then(
-        result => {
-          this.setState({
-            isLoaded: true,
-            rates: result.rates
-          });
-        },
-        error => {
-          this.setState({
-            isLoaded: true,
-            error
-          });
-        }
-      );
+    let urls = [
+      "https://api.exchangeratesapi.io/latest?base=USD",
+      "https://api.exchangeratesapi.io/latest?base=EUR",
+      "https://api.exchangeratesapi.io/latest?base=HKD",
+      "https://api.exchangeratesapi.io/latest?base=CAD"
+    ];
+    let requests = urls.map(url => fetch(url));
+    Promise.all(requests)
+      .then(responses => Promise.all(responses.map(response => response.json())))
+      .then(results => {
+        this.setState({
+          isLoaded: true,
+          USDrates: results[0].rates.JPY,
+          EURrates: results[1].rates.JPY,
+          HKDrates: results[2].rates.JPY,
+          CADrates: results[3].rates.JPY,
+        })
+      },
+      error => {
+        this.setState({
+          isLoaded: true,
+          error
+        });
+      });
+  }
+  componentDidUpdate() {
+    console.log(this.state.USDrates);
+    console.log(this.state.EURrates);
   }
 
-  createTable = () => {
-    const rates = this.state;
-    var ratesArr = Object.keys(rates).map(i => rates[i])[2];
-    var table = [];
-    var children = [];
-    var displayedCurrencies = ["JPY", "USD", "EUR", "HKD"];
-
-    for (var key in ratesArr) {
-      if (ratesArr.hasOwnProperty(key) && displayedCurrencies.includes(key)) {
-        children.push(
-          <tr>
-          <td>{key}</td>
-          <td>{ratesArr[key]}</td>
-          </tr>
-        );
-      }
-    }
-  table.push(<tbody>{children}</tbody>);
-
-  return table;
-};
-
   render() {
-    const { error, isLoaded } = this.state;
+    const { error, isLoaded} = this.state;
 
     if (error) {
       return <div>Oops: {error.message}</div>;
@@ -64,18 +58,16 @@ class App extends React.Component {
       return <div>Loading...</div>;
     } else {
       return (
-        <div>
-          <div>
-            <table>
-              <thead>
-                <tr>
-                  <th>Currency</th>
-                  <th>Rate</th>
-                </tr>
-              </thead>
-              {this.createTable()}
-            </table>
-          </div>
+        <div className="App">
+          <Header />
+          <div className="App__body">
+            <Table className="table"
+              USDrates = {this.state.USDrates}
+              EURrates = {this.state.EURrates}
+              HKDrates = {this.state.HKDrates}
+              CADrates = {this.state.CADrates}
+            />
+        </div>
         </div>
       )
     }
