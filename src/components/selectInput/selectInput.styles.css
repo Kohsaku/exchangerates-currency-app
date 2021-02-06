@@ -1,0 +1,16 @@
+.selectInput {
+    display: flex;
+    flex: 0.7;
+    align-items: center;
+    background-color: whitesmoke;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.formControl {
+    border: none;
+    width: 100%;
+    outline: none;
+    font-size: medium;
+    background-color: transparent;
+}

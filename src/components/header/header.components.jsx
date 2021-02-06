@@ -21,14 +21,14 @@ const Header = () => (
     </div>
 
     <div className="header__middle">
-      <FormControl className="header__middle__form">
+      {/* <FormControl className="header__middle__form">
         <InputLabel className="header__middle__form" id="demo-simple-select-label">Base Currency</InputLabel>
         <Select>
           <MenuItem value={"JPY"}>JPY</MenuItem>
           <MenuItem value={"USD"}>USD</MenuItem>
           <MenuItem value={"EUR"}>EUR</MenuItem>
         </Select>
-      </FormControl>
+      </FormControl> */}
     </div>
 
     <div className="header__right">
